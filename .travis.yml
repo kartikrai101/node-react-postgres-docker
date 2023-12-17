@@ -1,0 +1,11 @@
+sudo: required
+services: 
+  - docker
+
+# before installing, build a test version of our client project and then eventually run some tests inside it
+before_install: 
+  - docker build -t  kartik0912/react-test -f ./client/Dockerfile.dev ./client
+
+#after building the image in prev step, now we need to run some tests
+script: # the script section is the primary test running section 
+  - docker run kartik0912/react-test npm test -- --coverage
