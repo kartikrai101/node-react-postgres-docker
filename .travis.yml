@@ -2,10 +2,21 @@ sudo: required
 services: 
   - docker
 
-# before installing, build a test version of our client project and then eventually run some tests inside it
 before_install: 
   - docker build -t  kartik0912/react-test -f ./client/Dockerfile.dev ./client
 
-#after building the image in prev step, now we need to run some tests
-script: # the script section is the primary test running section 
+script:
   - docker run kartik0912/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t kartik0912/multi-client ./client
+  - docker build -t kartik0912/multi-nginx ./nginx
+  - docker build -t kartik0912/multi-server ./server
+
+# login to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+
+# Take the built images and push them to Docker Hub
+  - docker push kartik0912/multi-client
+  - docker push kartik0912/multi-nginx
+  - docker push kartik0912/multi-server
